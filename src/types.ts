@@ -1,4 +1,4 @@
-export type SupportedLocale = 'en' | 'th' | 'fr' | 'ja' | 'de';
+export type SupportedLocale = 'en' | 'th' | 'fr' | 'ja' | 'de' | 'et' | 'es' | 'fa';
 
 export interface LocaleConverter {
   convert(amount: number): string;

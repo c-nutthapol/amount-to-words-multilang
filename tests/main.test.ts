@@ -2,7 +2,7 @@ import { amountToWords } from '../src/index';
 
 // Helper function to test error handling across locales
 function testErrorAcrossLocales(input: number, expectedError: RegExp) {
-  const locales = ['en', 'th', 'fr', 'ja', 'de'] as const;
+  const locales = ['en', 'th', 'fr', 'ja', 'de', 'et', 'es', 'fa'] as const;
   locales.forEach(locale => {
     expect(() => amountToWords(input, locale)).toThrow(expectedError);
   });
@@ -10,7 +10,7 @@ function testErrorAcrossLocales(input: number, expectedError: RegExp) {
 
 // Helper function to test valid conversion across locales
 function testValidConversionAcrossLocales(amount: number) {
-  const locales = ['en', 'th', 'fr', 'ja', 'de'] as const;
+  const locales = ['en', 'th', 'fr', 'ja', 'de', 'et', 'es', 'fa'] as const;
   locales.forEach(locale => {
     const result = amountToWords(amount, locale);
     expect(typeof result).toBe('string');
@@ -28,10 +28,13 @@ describe('Main System Tests', () => {
       expect(() => amountToWords(testAmount, 'fr')).not.toThrow();
       expect(() => amountToWords(testAmount, 'ja')).not.toThrow();
       expect(() => amountToWords(testAmount, 'de')).not.toThrow();
+      expect(() => amountToWords(testAmount, 'et')).not.toThrow();
+      expect(() => amountToWords(testAmount, 'es')).not.toThrow();
+      expect(() => amountToWords(testAmount, 'fa')).not.toThrow();
     });
 
     test('throws error for unsupported locale', () => {
-      expect(() => amountToWords(100, 'es' as any)).toThrow('Unsupported locale: es');
+      expect(() => amountToWords(100, 'pt' as any)).toThrow('Unsupported locale: pt');
       expect(() => amountToWords(100, 'xyz' as any)).toThrow('Unsupported locale: xyz');
     });
 
@@ -51,7 +54,7 @@ describe('Main System Tests', () => {
       { amount: 1234.56, description: 'complex amount' }
     ];
 
-    const locales = ['en', 'th', 'fr', 'ja', 'de'] as const;
+    const locales = ['en', 'th', 'fr', 'ja', 'de', 'et', 'es', 'fa'] as const;
 
     testCases.forEach(({ amount, description }) => {
       test(`all locales handle ${description} (${amount})`, () => {

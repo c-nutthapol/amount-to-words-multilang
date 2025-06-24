@@ -1,14 +1,14 @@
 # Amount to Words - Multilingual
 
-A TypeScript library for converting numeric amounts to words in multiple languages (English, Thai, French, Japanese, German). Perfect for financial applications, invoice generation, and internationalization.
+A TypeScript library for converting numeric amounts to words in multiple languages (English, Thai, French, Japanese, German, Estonian, Spanish, Persian). Perfect for financial applications, invoice generation, and internationalization.
 
 ## Features
 
-- 🌍 **5 Languages**: English, Thai, French, Japanese, German
+- 🌍 **8 Languages**: English, Thai, French, Japanese, German, Estonian, Spanish, Persian
 - 💰 **Currency Support**: Handles major currencies with proper fractional units
 - ✅ **Type Safety**: Full TypeScript support with comprehensive type definitions
 - 🎯 **Zero Dependencies**: Pure TypeScript implementation without external libraries
-- 🧪 **Well Tested**: 96+ test cases covering edge cases and language-specific rules
+- 🧪 **Well Tested**: 149+ test cases covering edge cases and language-specific rules
 - 📦 **Lightweight**: Minimal bundle size with tree-shaking support
 
 ## Installation
@@ -41,6 +41,18 @@ console.log(amountToWords(1234.56, 'ja'));
 // German
 console.log(amountToWords(1234.56, 'de'));
 // "eintausendzweihundertvierunddreißig Euro und sechsundfünfzig Cent"
+
+// Estonian
+console.log(amountToWords(1234.56, 'et'));
+// "tuhat kakssada kolmkümmend neli eurot ja viiskümmend kuus senti"
+
+// Spanish
+console.log(amountToWords(1234.56, 'es'));
+// "mil doscientos treinta y cuatro euros y cincuenta y seis céntimos"
+
+// Persian
+console.log(amountToWords(1234.56, 'fa'));
+// "یک هزار و دویست و سی و چهار یورو و پنجاه و شش سنت"
 ```
 
 ## Supported Locales
@@ -52,6 +64,9 @@ console.log(amountToWords(1234.56, 'de'));
 | `fr` | French | Euro | Centimes |
 | `ja` | Japanese | Yen | Sen |
 | `de` | German | Euro | Cent |
+| `et` | Estonian | Euro | Senti |
+| `es` | Spanish | Euro | Céntimos |
+| `fa` | Persian | Euro | Cent |
 
 ## API Reference
 
@@ -62,7 +77,7 @@ Converts a numeric amount to words in the specified language.
 **Parameters:**
 
 - `amount` (number): The numeric amount to convert (must be non-negative and finite)
-- `locale` (string, optional): The target locale ('en', 'th', 'fr', 'ja', 'de'). Defaults to 'en'
+- `locale` (string, optional): The target locale ('en', 'th', 'fr', 'ja', 'de', 'et', 'es', 'fa'). Defaults to 'en'
 
 **Returns:**
 
@@ -82,7 +97,10 @@ import {
   thaiConverter,
   frenchConverter,
   japaneseConverter,
-  germanConverter
+  germanConverter,
+  estonianConverter,
+  spanishConverter,
+  persianConverter
 } from 'amount-to-words-multilang';
 
 console.log(englishConverter.convert(100.50));
@@ -90,6 +108,9 @@ console.log(thaiConverter.convert(100.50));
 console.log(frenchConverter.convert(100.50));
 console.log(japaneseConverter.convert(100.50));
 console.log(germanConverter.convert(100.50));
+console.log(estonianConverter.convert(100.50));
+console.log(spanishConverter.convert(100.50));
+console.log(persianConverter.convert(100.50));
 ```
 
 ## Language-Specific Features
@@ -124,6 +145,24 @@ console.log(germanConverter.convert(100.50));
 - Proper use of "ein" vs "eins" in different contexts
 - Complex compound word formation for large numbers
 
+### Estonian (Eesti)
+
+- Proper singular/plural forms for "euro" and "sent"
+- Uses traditional Estonian number system
+- Special handling for compound numbers and ordinals
+
+### Spanish (Español)
+
+- Proper gender agreement and plural forms
+- Handles millions/billions correctly ("mil millones", "un millón")
+- Uses "y" (and) for compound numbers
+
+### Persian (فارسی)
+
+- Right-to-left text formatting
+- Uses Persian numerals and traditional number system
+- Proper conjunction handling with "و" (va/and)
+
 ## Examples
 
 ### Basic Usage
@@ -142,6 +181,9 @@ amountToWords(100, 'fr');   // "cent euros"
 // Decimals
 amountToWords(1.50, 'en');  // "one dollar and fifty cents"
 amountToWords(42.99, 'de'); // "zweiundvierzig Euro und neunundneunzig Cent"
+amountToWords(99.01, 'et'); // "üheksakümmend üheksa eurot ja üks sent"
+amountToWords(75.25, 'es'); // "setenta y cinco euros y veinticinco céntimos"
+amountToWords(33.67, 'fa'); // "سی و سه یورو و شصت و هفت سنت"
 ```
 
 ### Complex Numbers
@@ -195,7 +237,10 @@ src/
     ├── th.ts            # Thai converter
     ├── fr.ts            # French converter
     ├── ja.ts            # Japanese converter
-    └── de.ts            # German converter
+    ├── de.ts            # German converter
+    ├── et.ts            # Estonian converter
+    ├── es.ts            # Spanish converter
+    └── fa.ts            # Persian converter
 
 tests/
 ├── main.test.ts         # Integration tests
@@ -203,7 +248,10 @@ tests/
 ├── th.test.ts          # Thai converter tests
 ├── fr.test.ts          # French converter tests
 ├── ja.test.ts          # Japanese converter tests
-└── de.test.ts          # German converter tests
+├── de.test.ts          # German converter tests
+├── et.test.ts          # Estonian converter tests
+├── es.test.ts          # Spanish converter tests
+└── fa.test.ts          # Persian converter tests
 ```
 
 ## Contributing
@@ -225,6 +273,13 @@ To add support for a new language:
 MIT License - see LICENSE file for details.
 
 ## Changelog
+
+### 1.1.0
+
+- Added support for Estonian (et), Spanish (es), and Persian (fa)
+- Comprehensive test coverage for all new languages
+- Fixed language-specific grammar and edge cases
+- Updated to 149+ test cases
 
 ### 1.0.0
 
