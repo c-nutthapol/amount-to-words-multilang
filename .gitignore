@@ -1,0 +1,4 @@
+node_modules
+coverage
+dist
+copilot.prompt.md

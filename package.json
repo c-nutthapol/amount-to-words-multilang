@@ -1,0 +1,38 @@
+{
+  "name": "amount-to-words-multilang",
+  "version": "1.0.0",
+  "description": "Convert numbers to words in multiple languages (EN, TH, FR, JA, DE)",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:verbose": "jest --verbose"
+  },
+  "keywords": [
+    "amount",
+    "words",
+    "i18n",
+    "number-to-words",
+    "multilang",
+    "thai",
+    "english",
+    "french",
+    "japanese",
+    "german",
+    "currency"
+  ],
+  "author": "DevCode",
+  "license": "MIT",
+  "dependencies": {
+    "@types/node": "^24.0.3"
+  },
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "jest": "^30.0.2",
+    "ts-jest": "^29.4.0",
+    "typescript": "^5.8.3"
+  }
+}
