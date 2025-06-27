@@ -1,7 +1,7 @@
 {
   "name": "amount-to-words-multilang",
-  "version": "1.1.1",
-  "description": "Convert numbers to words in multiple languages (EN, TH, FR, JA, DE, ET, ES, FA)",
+  "version": "1.2.0",
+  "description": "Convert numbers to words in multiple languages (EN, TH, FR, JA, DE, ET, ES, FA, ZH)",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -25,9 +25,18 @@
     "estonian",
     "spanish",
     "persian",
+    "chinese",
     "currency"
   ],
-  "author": "DevCode",
+  "author": "c-nutthapol",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/c-nutthapol/amount-to-words-multilang.git"
+  },
+  "bugs": {
+    "url": "https://github.com/c-nutthapol/amount-to-words-multilang/issues"
+  },
+  "homepage": "https://github.com/c-nutthapol/amount-to-words-multilang#readme",
   "license": "MIT",
   "dependencies": {
     "@types/node": "^24.0.3"

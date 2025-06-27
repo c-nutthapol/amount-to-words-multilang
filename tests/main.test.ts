@@ -2,7 +2,7 @@ import { amountToWords } from '../src/index';
 
 // Helper function to test error handling across locales
 function testErrorAcrossLocales(input: number, expectedError: RegExp) {
-  const locales = ['en', 'th', 'fr', 'ja', 'de', 'et', 'es', 'fa'] as const;
+  const locales = ['en', 'th', 'fr', 'ja', 'de', 'et', 'es', 'fa', 'zh'] as const;
   locales.forEach(locale => {
     expect(() => amountToWords(input, locale)).toThrow(expectedError);
   });
@@ -10,7 +10,7 @@ function testErrorAcrossLocales(input: number, expectedError: RegExp) {
 
 // Helper function to test valid conversion across locales
 function testValidConversionAcrossLocales(amount: number) {
-  const locales = ['en', 'th', 'fr', 'ja', 'de', 'et', 'es', 'fa'] as const;
+  const locales = ['en', 'th', 'fr', 'ja', 'de', 'et', 'es', 'fa', 'zh'] as const;
   locales.forEach(locale => {
     const result = amountToWords(amount, locale);
     expect(typeof result).toBe('string');
@@ -31,6 +31,7 @@ describe('Main System Tests', () => {
       expect(() => amountToWords(testAmount, 'et')).not.toThrow();
       expect(() => amountToWords(testAmount, 'es')).not.toThrow();
       expect(() => amountToWords(testAmount, 'fa')).not.toThrow();
+      expect(() => amountToWords(testAmount, 'zh')).not.toThrow();
     });
 
     test('throws error for unsupported locale', () => {
@@ -54,7 +55,7 @@ describe('Main System Tests', () => {
       { amount: 1234.56, description: 'complex amount' }
     ];
 
-    const locales = ['en', 'th', 'fr', 'ja', 'de', 'et', 'es', 'fa'] as const;
+    const locales = ['en', 'th', 'fr', 'ja', 'de', 'et', 'es', 'fa', 'zh'] as const;
 
     testCases.forEach(({ amount, description }) => {
       test(`all locales handle ${description} (${amount})`, () => {
@@ -85,15 +86,15 @@ describe('Main System Tests', () => {
 
   describe('Error handling consistency', () => {
     test('all locales handle negative numbers consistently', () => {
-      testErrorAcrossLocales(-1, /negative|ลบ|négatif|負|negativ/i);
+      testErrorAcrossLocales(-1, /negative|ลบ|négatif|負|negativ|负数/i);
     });
 
     test('all locales handle infinity consistently', () => {
-      testErrorAcrossLocales(Infinity, /finite|ถูกต้อง|fini|有限|endlich/i);
+      testErrorAcrossLocales(Infinity, /finite|ถูกต้อง|fini|有限|endlich|有限的/i);
     });
 
     test('all locales handle NaN consistently', () => {
-      testErrorAcrossLocales(NaN, /finite|ถูกต้อง|fini|有限|endlich/i);
+      testErrorAcrossLocales(NaN, /finite|ถูกต้อง|fini|有限|endlich|有限的/i);
     });
   });
 
@@ -118,6 +119,7 @@ describe('Main System Tests', () => {
       amountToWords(999999999.99, 'fr');
       amountToWords(999999999.99, 'ja');
       amountToWords(999999999.99, 'de');
+      amountToWords(999999999.99, 'zh');
 
       const duration = Date.now() - start;
       expect(duration).toBeLessThan(1000); // Should complete in less than 1 second

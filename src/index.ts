@@ -6,6 +6,7 @@ import { deConverter } from './locales/de';
 import { EstonianConverter } from './locales/et';
 import { SpanishConverter } from './locales/es';
 import { PersianConverter } from './locales/fa';
+import { zhConverter } from './locales/zh';
 import { SupportedLocale, ConversionOptions } from './types';
 
 const etConverter = new EstonianConverter();
@@ -21,6 +22,7 @@ const converters = {
   et: etConverter,
   es: esConverter,
   fa: faConverter,
+  zh: zhConverter,
 } as const;
 
 export function amountToWords(amount: number, locale?: SupportedLocale): string;
@@ -52,5 +54,5 @@ export function amountToWords(
 }
 
 // Export locales for direct access
-export { enConverter, thConverter, frConverter, jaConverter, deConverter, etConverter, esConverter, faConverter };
+export { enConverter, thConverter, frConverter, jaConverter, deConverter, etConverter, esConverter, faConverter, zhConverter };
 export * from './types';

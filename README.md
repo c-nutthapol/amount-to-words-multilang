@@ -1,14 +1,14 @@
 # Amount to Words - Multilingual
 
-A TypeScript library for converting numeric amounts to words in multiple languages (English, Thai, French, Japanese, German, Estonian, Spanish, Persian). Perfect for financial applications, invoice generation, and internationalization.
+A TypeScript library for converting numeric amounts to words in multiple languages (English, Thai, French, Japanese, German, Estonian, Spanish, Persian, Chinese). Perfect for financial applications, invoice generation, and internationalization.
 
 ## Features
 
-- 🌍 **8 Languages**: English, Thai, French, Japanese, German, Estonian, Spanish, Persian
+- 🌍 **9 Languages**: English, Thai, French, Japanese, German, Estonian, Spanish, Persian, Chinese
 - 💰 **Currency Support**: Handles major currencies with proper fractional units
 - ✅ **Type Safety**: Full TypeScript support with comprehensive type definitions
 - 🎯 **Zero Dependencies**: Pure TypeScript implementation without external libraries
-- 🧪 **Well Tested**: 149+ test cases covering edge cases and language-specific rules
+- 🧪 **Well Tested**: 163+ test cases covering edge cases and language-specific rules
 - 📦 **Lightweight**: Minimal bundle size with tree-shaking support
 
 ## Installation
@@ -53,6 +53,10 @@ console.log(amountToWords(1234.56, 'es'));
 // Persian
 console.log(amountToWords(1234.56, 'fa'));
 // "یک هزار و دویست و سی و چهار یورو و پنجاه و شش سنت"
+
+// Chinese
+console.log(amountToWords(1234.56, 'zh'));
+// "一千二百三十四元五十六分"
 ```
 
 ## Supported Locales
@@ -67,6 +71,7 @@ console.log(amountToWords(1234.56, 'fa'));
 | `et` | Estonian | Euro | Senti |
 | `es` | Spanish | Euro | Céntimos |
 | `fa` | Persian | Euro | Cent |
+| `zh` | Chinese | Yuan | Fen |
 
 ## API Reference
 
@@ -77,7 +82,7 @@ Converts a numeric amount to words in the specified language.
 **Parameters:**
 
 - `amount` (number): The numeric amount to convert (must be non-negative and finite)
-- `locale` (string, optional): The target locale ('en', 'th', 'fr', 'ja', 'de', 'et', 'es', 'fa'). Defaults to 'en'
+- `locale` (string, optional): The target locale ('en', 'th', 'fr', 'ja', 'de', 'et', 'es', 'fa', 'zh'). Defaults to 'en'
 
 **Returns:**
 
@@ -100,7 +105,8 @@ import {
   germanConverter,
   estonianConverter,
   spanishConverter,
-  persianConverter
+  persianConverter,
+  chineseConverter
 } from 'amount-to-words-multilang';
 
 console.log(englishConverter.convert(100.50));
@@ -111,6 +117,7 @@ console.log(germanConverter.convert(100.50));
 console.log(estonianConverter.convert(100.50));
 console.log(spanishConverter.convert(100.50));
 console.log(persianConverter.convert(100.50));
+console.log(chineseConverter.convert(100.50));
 ```
 
 ## Language-Specific Features
@@ -163,6 +170,13 @@ console.log(persianConverter.convert(100.50));
 - Uses Persian numerals and traditional number system
 - Proper conjunction handling with "و" (va/and)
 
+### Chinese (中文)
+
+- Traditional Chinese number system with 万 (wan) and 億 (yi)
+- Proper handling of zero positions with "零"
+- Uses 元 (yuan) and 分 (fen) currency units
+- Special rules for compound numbers and large numbers
+
 ## Examples
 
 ### Basic Usage
@@ -184,6 +198,7 @@ amountToWords(42.99, 'de'); // "zweiundvierzig Euro und neunundneunzig Cent"
 amountToWords(99.01, 'et'); // "üheksakümmend üheksa eurot ja üks sent"
 amountToWords(75.25, 'es'); // "setenta y cinco euros y veinticinco céntimos"
 amountToWords(33.67, 'fa'); // "سی و سه یورو و شصت و هفت سنت"
+amountToWords(88.99, 'zh'); // "八十八元九十九分"
 ```
 
 ### Complex Numbers
@@ -192,6 +207,7 @@ amountToWords(33.67, 'fa'); // "سی و سه یورو و شصت و هفت سنت
 // Large numbers
 amountToWords(1000000, 'en');    // "one million dollars"
 amountToWords(12345678, 'ja');   // "千二百三十四万五千六百七十八円"
+amountToWords(987654321, 'zh');  // "九億八千七百六十五万四千三百二十一元"
 
 // Precision handling
 amountToWords(0.1 + 0.2, 'en');  // Handles floating-point precision correctly
@@ -240,7 +256,8 @@ src/
     ├── de.ts            # German converter
     ├── et.ts            # Estonian converter
     ├── es.ts            # Spanish converter
-    └── fa.ts            # Persian converter
+    ├── fa.ts            # Persian converter
+    └── zh.ts            # Chinese converter
 
 tests/
 ├── main.test.ts         # Integration tests
@@ -251,7 +268,8 @@ tests/
 ├── de.test.ts          # German converter tests
 ├── et.test.ts          # Estonian converter tests
 ├── es.test.ts          # Spanish converter tests
-└── fa.test.ts          # Persian converter tests
+├── fa.test.ts          # Persian converter tests
+└── zh.test.ts          # Chinese converter tests
 ```
 
 ## Contributing
@@ -273,6 +291,13 @@ To add support for a new language:
 MIT License - see LICENSE file for details.
 
 ## Changelog
+
+### 1.2.0
+
+- Added support for Chinese (zh)
+- Traditional Chinese number system with 万 and 億
+- Proper zero handling and currency formatting
+- Updated to 162+ test cases covering all languages
 
 ### 1.1.0
 
