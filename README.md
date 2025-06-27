@@ -297,7 +297,7 @@ MIT License - see LICENSE file for details.
 - Added support for Chinese (zh)
 - Traditional Chinese number system with 万 and 億
 - Proper zero handling and currency formatting
-- Updated to 162+ test cases covering all languages
+- Updated to 163+ test cases covering all languages
 
 ### 1.1.0
 
