@@ -1,6 +1,6 @@
 {
   "name": "amount-to-words-multilang",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "description": "Convert numbers to words in multiple languages (EN, TH, FR, JA, DE, ET, ES, FA, ZH)",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
