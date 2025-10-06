@@ -34,13 +34,13 @@ console.log(amountToWords(1234.56, 'th'));
 console.log(amountToWords(1234.56, 'fr'));
 // "mille deux cent trente-quatre euros et cinquante-six centimes"
 
-// Japanese
+// Japanese (hiragana output)
 console.log(amountToWords(1234.56, 'ja'));
-// "千二百三十四円五十六銭"
+// "せんにひゃくさんじゅうよんえんごじゅうろくせん"
 
 // German
 console.log(amountToWords(1234.56, 'de'));
-// "eintausendzweihundertvierunddreißig Euro und sechsundfünfzig Cent"
+// "eintausend zweihundertvierunddreißig Euro und sechsundfünfzig Cent"
 
 // Estonian
 console.log(amountToWords(1234.56, 'et'));
@@ -98,27 +98,86 @@ You can also import and use converters directly:
 
 ```typescript
 import {
-  englishConverter,
-  thaiConverter,
-  frenchConverter,
-  japaneseConverter,
-  germanConverter,
-  estonianConverter,
-  spanishConverter,
-  persianConverter,
-  chineseConverter
+  enConverter,
+  thConverter,
+  frConverter,
+  jaConverter,
+  deConverter,
+  etConverter,
+  esConverter,
+  faConverter,
+  zhConverter
 } from 'amount-to-words-multilang';
 
-console.log(englishConverter.convert(100.50));
-console.log(thaiConverter.convert(100.50));
-console.log(frenchConverter.convert(100.50));
-console.log(japaneseConverter.convert(100.50));
-console.log(germanConverter.convert(100.50));
-console.log(estonianConverter.convert(100.50));
-console.log(spanishConverter.convert(100.50));
-console.log(persianConverter.convert(100.50));
-console.log(chineseConverter.convert(100.50));
+console.log(enConverter.convert(100.50));
+console.log(thConverter.convert(100.50));
+console.log(frConverter.convert(100.50));
+console.log(jaConverter.convert(100.50));
+console.log(deConverter.convert(100.50));
+console.log(etConverter.convert(100.50));
+console.log(esConverter.convert(100.50));
+console.log(faConverter.convert(100.50));
+console.log(zhConverter.convert(100.50));
 ```
+
+## Currency Options
+
+This library supports flexible currency handling beyond default locale units. Use `ConversionOptions` to control currency, minor digits, and unit words.
+
+```typescript
+import { amountToWords } from 'amount-to-words-multilang';
+
+// English with Thai Baht
+amountToWords(123.45, { locale: 'en', currency: 'THB' });
+// "one hundred twenty-three baht and forty-five satang"
+
+// Thai with Baht (shows "ถ้วน" when no satang)
+amountToWords(123, { locale: 'th', currency: 'THB' });
+// "หนึ่งร้อยยี่สิบสามบาทถ้วน"
+
+// English with Japanese Yen (JPY has 0 minor digits)
+amountToWords(123.45, { locale: 'en', currency: 'JPY' });
+// "one hundred twenty-three yen"
+
+// Japanese with JPY (hiragana output)
+amountToWords(123.45, { locale: 'ja', currency: 'JPY' });
+// "ひゃくにじゅうさんえん"
+
+// Override units explicitly (any locale)
+amountToWords(10.5, {
+  locale: 'en',
+  unitsOverride: {
+    majorSingular: 'credit',
+    majorPlural: 'credits',
+    minorSingular: 'point',
+    minorPlural: 'points',
+  },
+});
+// "ten credits and fifty points"
+```
+
+### ConversionOptions
+
+```ts
+type ConversionOptions = {
+  locale?: 'en' | 'th' | 'fr' | 'ja' | 'de' | 'et' | 'es' | 'fa' | 'zh';
+  currency?: 'USD' | 'EUR' | 'THB' | 'JPY' | 'GBP' | 'CNY';
+  minorDigits?: number; // overrides currency defaults (e.g. JPY: 0)
+  unitsOverride?: {
+    majorSingular: string;
+    majorPlural: string;
+    minorSingular: string;
+    minorPlural: string;
+  };
+  // Thai-specific
+  showMinorIfZero?: boolean; // default true, adds "ถ้วน" when no satang
+}
+```
+
+Default currency minor digits (ISO 4217 common defaults):
+- USD: 2, EUR: 2, THB: 2, JPY: 0, GBP: 2, CNY: 2
+
+Unit words are resolved per-locale and per-currency, and can be overridden via `unitsOverride`.
 
 ## Language-Specific Features
 
@@ -291,6 +350,15 @@ To add support for a new language:
 MIT License - see LICENSE file for details.
 
 ## Changelog
+
+### 1.3.0
+
+- Added flexible currency support: `currency`, `minorDigits`, `unitsOverride`
+- Centralized currency metadata in `src/currencies.ts` with ISO minor digits
+- JPY (0 minor digits) and THB unit words integrated across locales
+- English: improved minor-unit rounding (fixes 1.005 → 1.01)
+- French: use singular for zero amounts ("zéro euro")
+- Updated tests to 167 cases; added currency tests for THB/JPY
 
 ### 1.2.0
 

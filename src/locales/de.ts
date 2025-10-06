@@ -1,4 +1,4 @@
-import { LocaleConverter } from '../types';
+import { LocaleConverter, ConversionOptions } from '../types';
 
 const ones = [
   '', 'ein', 'zwei', 'drei', 'vier', 'fünf', 'sechs', 'sieben', 'acht', 'neun'
@@ -135,7 +135,7 @@ function handleTensAndOnesDE(n: number, hasHundreds: boolean = false): string {
 }
 
 export const deConverter: LocaleConverter = {
-  convert(amount: number): string {
+  convert(amount: number, options?: ConversionOptions): string {
     // Validate input
     if (!isFinite(amount)) {
       throw new Error('Der Betrag muss eine endliche Zahl sein');
@@ -149,34 +149,35 @@ export const deConverter: LocaleConverter = {
       throw new Error('Betrag zu groß (über Billiarde Euro)');
     }
 
-    // Handle floating point precision by parsing string representation
-    const amountStr = amount.toFixed(3);
-    const [majorStr, minorStr = ''] = amountStr.split('.');
+    // Round according to minorDigits (default 2)
+    const minorDigits = options?.minorDigits ?? 2;
+    const factor = Math.pow(10, minorDigits);
+    const roundedAmount = Math.round(amount * factor) / factor;
+    const [majorStr, minorStr = ''] = roundedAmount.toFixed(minorDigits).split('.');
     const major = parseInt(majorStr, 10);
-
-    // Parse the decimal part and round to 2 places
-    let minor = 0;
-    if (minorStr.length > 0) {
-      const threeDigits = minorStr.padEnd(3, '0').substring(0, 3);
-      const threeDigitNum = parseInt(threeDigits, 10);
-      minor = Math.round(threeDigitNum / 10); // Round from 3 digits to 2
-    }
+    const minor = minorDigits > 0 ? parseInt(minorStr || '0', 10) : 0;
 
     let result = '';
 
+    const units = options?.unitsOverride ?? {
+      majorSingular: 'Euro',
+      majorPlural: 'Euro',
+      minorSingular: 'Cent',
+      minorPlural: 'Cent',
+    };
     if (major === 0) {
-      result = 'null Euro';
+      result = `null ${units.majorPlural}`;
     } else if (major === 1) {
-      result = 'ein Euro';
+      result = `ein ${units.majorSingular}`;
     } else {
-      result = `${numberToWordsDE(major)} Euro`;
+      result = `${numberToWordsDE(major)} ${units.majorPlural}`;
     }
 
     if (minor > 0) {
       if (minor === 1) {
-        result += ' und ein Cent';
+        result += ` und ein ${units.minorSingular}`;
       } else {
-        result += ` und ${numberToWordsDE(minor)} Cent`;
+        result += ` und ${numberToWordsDE(minor)} ${units.minorPlural}`;
       }
     }
 

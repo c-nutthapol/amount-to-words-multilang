@@ -1,4 +1,4 @@
-import { LocaleConverter } from '../types';
+import { LocaleConverter, ConversionOptions } from '../types';
 
 /**
  * Estonian Number to Words Converter
@@ -29,7 +29,7 @@ export class EstonianConverter implements LocaleConverter {
     { value: 100, singular: 'sada', plural: 'sada' }
   ];
 
-  convert(amount: number): string {
+  convert(amount: number, options?: ConversionOptions): string {
     if (!this.isValidNumber(amount)) {
       throw new Error('Amount must be a non-negative finite number');
     }
@@ -38,24 +38,35 @@ export class EstonianConverter implements LocaleConverter {
       throw new Error('Amount too large');
     }
 
-    const [wholePart, decimalPart] = this.parseAmount(amount);
+    // Round according to minorDigits (default 2)
+    const minorDigits = options?.minorDigits ?? 2;
+    const factor = Math.pow(10, minorDigits);
+    const roundedAmount = Math.round(amount * factor) / factor;
+    const [majorStr, minorStr = ''] = roundedAmount.toFixed(minorDigits).split('.');
+    const wholePart = parseInt(majorStr, 10);
+    const decimalPart = minorDigits > 0 ? parseInt(minorStr || '0', 10) : 0;
 
     let result = '';
 
+    const units = options?.unitsOverride ?? {
+      majorSingular: 'euro',
+      majorPlural: 'eurot',
+      minorSingular: 'sent',
+      minorPlural: 'senti',
+    };
     if (wholePart === 0) {
-      result = 'null eurot';
+      result = `null ${units.majorPlural}`;
     } else {
       const wholeWords = this.convertWholeNumber(wholePart);
-      // Estonian rule: numbers ending in 1 (but not 11) use singular "euro"
       const isPlural = this.shouldUsePluralCurrency(wholePart);
-      const euroText = isPlural ? 'eurot' : 'euro';
+      const euroText = isPlural ? units.majorPlural : units.majorSingular;
       result = `${wholeWords} ${euroText}`;
     }
 
     if (decimalPart > 0) {
       const centWords = this.convertWholeNumber(decimalPart);
       const isPlural = this.shouldUsePluralCurrency(decimalPart);
-      const sentText = isPlural ? 'senti' : 'sent';
+      const sentText = isPlural ? units.minorPlural : units.minorSingular;
       result += ` ${centWords} ${sentText}`;
     }
 

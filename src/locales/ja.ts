@@ -1,4 +1,4 @@
-import { LocaleConverter } from '../types';
+import { LocaleConverter, ConversionOptions } from '../types';
 
 const ones = ['', '一', '二', '三', '四', '五', '六', '七', '八', '九'];
 const onesReading = ['', 'いち', 'に', 'さん', 'よん', 'ご', 'ろく', 'なな', 'はち', 'きゅう'];
@@ -126,7 +126,7 @@ function convertChunkJA(n: number): string {
 }
 
 export const jaConverter: LocaleConverter = {
-  convert(amount: number): string {
+  convert(amount: number, options?: ConversionOptions): string {
     // Validate input
     if (!isFinite(amount)) {
       throw new Error('金額は有限数である必要があります');
@@ -140,22 +140,27 @@ export const jaConverter: LocaleConverter = {
       throw new Error('金額が大きすぎます（一兆円を超えています）');
     }
 
-    // Round to 2 decimal places
-    const roundedAmount = Math.round(amount * 100) / 100;
-    const [majorStr, minorStr] = roundedAmount.toFixed(2).split('.');
+    // Round according to minorDigits (default 2)
+    const minorDigits = options?.minorDigits ?? 2;
+    const factor = Math.pow(10, minorDigits);
+    const roundedAmount = Math.round(amount * factor) / factor;
+    const [majorStr, minorStr = ''] = roundedAmount.toFixed(minorDigits).split('.');
     const major = parseInt(majorStr, 10);
-    const minor = parseInt(minorStr, 10);
+    const minor = minorDigits > 0 ? parseInt(minorStr || '0', 10) : 0;
 
     let result = '';
 
+    const majorUnit = options?.majorUnit ?? 'えん';
+    const minorUnit = options?.minorUnit ?? 'せん';
+
     if (major === 0) {
-      result = 'ぜろえん';
+      result = `ぜろ${majorUnit}`;
     } else {
-      result = numberToWordsJA(major) + 'えん';
+      result = numberToWordsJA(major) + majorUnit;
     }
 
     if (minor > 0) {
-      result += numberToWordsJA(minor) + 'せん';
+      result += numberToWordsJA(minor) + minorUnit;
     }
 
     return result;

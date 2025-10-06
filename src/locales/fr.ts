@@ -1,4 +1,4 @@
-import { LocaleConverter } from '../types';
+import { LocaleConverter, ConversionOptions } from '../types';
 
 const ones = [
   '', 'un', 'deux', 'trois', 'quatre', 'cinq', 'six', 'sept', 'huit', 'neuf'
@@ -144,7 +144,7 @@ function convertChunkFR(n: number): string {
 }
 
 export const frConverter: LocaleConverter = {
-  convert(amount: number): string {
+  convert(amount: number, options?: ConversionOptions): string {
     // Validate input
     if (!isFinite(amount)) {
       throw new Error('Le montant doit être un nombre fini');
@@ -158,27 +158,36 @@ export const frConverter: LocaleConverter = {
       throw new Error('Montant trop important (au-delà du billiard d\'euros)');
     }
 
-    // Round to 2 decimal places
-    const roundedAmount = Math.round(amount * 100) / 100;
-    const [majorStr, minorStr] = roundedAmount.toFixed(2).split('.');
+    // Round according to minorDigits (default 2)
+    const minorDigits = options?.minorDigits ?? 2;
+    const factor = Math.pow(10, minorDigits);
+    const roundedAmount = Math.round(amount * factor) / factor;
+    const [majorStr, minorStr = ''] = roundedAmount.toFixed(minorDigits).split('.');
     const major = parseInt(majorStr, 10);
-    const minor = parseInt(minorStr, 10);
+    const minor = minorDigits > 0 ? parseInt(minorStr || '0', 10) : 0;
 
     let result = '';
 
+    const units = options?.unitsOverride ?? {
+      majorSingular: 'euro',
+      majorPlural: 'euros',
+      minorSingular: 'centime',
+      minorPlural: 'centimes',
+    };
     if (major === 0) {
-      result = 'zéro euro';
+      // French style in tests: use singular for zero euro
+      result = `zéro ${units.majorSingular}`;
     } else if (major === 1) {
-      result = 'un euro';
+      result = `un ${units.majorSingular}`;
     } else {
-      result = `${numberToWordsFR(major)} euros`;
+      result = `${numberToWordsFR(major)} ${units.majorPlural}`;
     }
 
     if (minor > 0) {
       if (minor === 1) {
-        result += ' et un centime';
+        result += ` et un ${units.minorSingular}`;
       } else {
-        result += ` et ${numberToWordsFR(minor)} centimes`;
+        result += ` et ${numberToWordsFR(minor)} ${units.minorPlural}`;
       }
     }
 

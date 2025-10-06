@@ -1,14 +1,14 @@
-import { LocaleConverter } from '../types';
+import { LocaleConverter, ConversionOptions } from '../types';
 
 export class ChineseConverter implements LocaleConverter {
   private readonly numbers = [
     '零', '一', '二', '三', '四', '五', '六', '七', '八', '九'
   ];
 
-  private readonly majorUnit = '元';
-  private readonly minorUnit = '分';
+  private readonly defaultMajorUnit = '元';
+  private readonly defaultMinorUnit = '分';
 
-  convert(amount: number): string {
+  convert(amount: number, options?: ConversionOptions): string {
     // Validate input
     if (!isFinite(amount)) {
       throw new Error('金额必须是有限的数字');
@@ -22,33 +22,34 @@ export class ChineseConverter implements LocaleConverter {
       return '零元';
     }
 
-    // Split into yuan (major) and fen (minor) parts
-    let yuan = Math.floor(amount);
-    let fen = Math.round((amount - yuan) * 100);
-
-    // Handle rounding overflow
-    if (fen >= 100) {
-      yuan += Math.floor(fen / 100);
-      fen = fen % 100;
-    }
+    // Round according to minorDigits (default 2)
+    const minorDigits = options?.minorDigits ?? 2;
+    const factor = Math.pow(10, minorDigits);
+    const roundedAmount = Math.round(amount * factor) / factor;
+    const [majorStr, minorStr = ''] = roundedAmount.toFixed(minorDigits).split('.');
+    let yuan = parseInt(majorStr, 10);
+    let fen = minorDigits > 0 ? parseInt(minorStr || '0', 10) : 0;
 
     let result = '';
 
+    const majorUnit = options?.majorUnit ?? this.defaultMajorUnit;
+    const minorUnit = options?.minorUnit ?? this.defaultMinorUnit;
+
     // Convert yuan part
     if (yuan > 0) {
-      result += this.convertInteger(yuan) + this.majorUnit;
+      result += this.convertInteger(yuan) + majorUnit;
     }
 
     // Convert fen part
     if (fen > 0) {
       if (yuan > 0) {
-        result += (fen < 10 ? '零' : '') + this.convertCents(fen) + this.minorUnit;
+        result += (fen < 10 ? '零' : '') + this.convertCents(fen) + minorUnit;
       } else {
-        result += this.convertCents(fen) + this.minorUnit;
+        result += this.convertCents(fen) + minorUnit;
       }
     }
 
-    return result || '零元';
+    return result || `零${majorUnit}`;
   }
 
   private convertInteger(num: number): string {

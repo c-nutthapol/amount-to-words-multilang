@@ -1,4 +1,4 @@
-import { LocaleConverter } from '../types';
+import { LocaleConverter, ConversionOptions } from '../types';
 
 /**
  * Persian (Farsi) Number to Words Converter
@@ -32,7 +32,7 @@ export class PersianConverter implements LocaleConverter {
     { value: 1000, name: 'هزار' }
   ];
 
-  convert(amount: number): string {
+  convert(amount: number, options?: ConversionOptions): string {
     if (!this.isValidNumber(amount)) {
       throw new Error('Amount must be a non-negative finite number');
     }
@@ -41,20 +41,32 @@ export class PersianConverter implements LocaleConverter {
       throw new Error('Amount too large');
     }
 
-    const [wholePart, decimalPart] = this.parseAmount(amount);
+    // Round according to minorDigits (default 2)
+    const minorDigits = options?.minorDigits ?? 2;
+    const factor = Math.pow(10, minorDigits);
+    const roundedAmount = Math.round(amount * factor) / factor;
+    const [majorStr, minorStr = ''] = roundedAmount.toFixed(minorDigits).split('.');
+    const wholePart = parseInt(majorStr, 10);
+    const decimalPart = minorDigits > 0 ? parseInt(minorStr || '0', 10) : 0;
 
     let result = '';
 
+    const units = options?.unitsOverride ?? {
+      majorSingular: 'یورو',
+      majorPlural: 'یورو',
+      minorSingular: 'سنت',
+      minorPlural: 'سنت',
+    };
     if (wholePart === 0) {
-      result = 'صفر یورو';
+      result = `صفر ${units.majorPlural}`;
     } else {
       const wholeWords = this.convertWholeNumber(wholePart);
-      result = `${wholeWords} یورو`;
+      result = `${wholeWords} ${units.majorPlural}`;
     }
 
     if (decimalPart > 0) {
       const centWords = this.convertWholeNumber(decimalPart);
-      result += ` ${centWords} سنت`;
+      result += ` ${centWords} ${units.minorPlural}`;
     }
 
     return result;

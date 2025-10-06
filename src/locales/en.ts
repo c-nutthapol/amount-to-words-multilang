@@ -1,4 +1,4 @@
-import { LocaleConverter } from '../types';
+import { LocaleConverter, ConversionOptions } from '../types';
 
 const ones = [
   '', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'
@@ -73,7 +73,7 @@ function convertChunk(n: number): string {
 }
 
 export const enConverter: LocaleConverter = {
-  convert(amount: number): string {
+  convert(amount: number, options?: ConversionOptions): string {
     // Validate input
     if (!isFinite(amount)) {
       throw new Error('Amount must be a finite number');
@@ -87,36 +87,50 @@ export const enConverter: LocaleConverter = {
     if (amount >= 1000000000000000) {
       throw new Error('Amount too large (beyond quadrillion dollars)');
     }
-
-    // Handle floating point precision by parsing string representation
-    // This ensures proper rounding for cases like 1.005 -> 1.01
-    const amountStr = amount.toFixed(3);
-    const [majorStr, minorStr = ''] = amountStr.split('.');
-    const major = parseInt(majorStr, 10);
-
-    // Parse the decimal part and round to 2 places
+    // Determine minor digits (defaults to 2) with robust rounding
+    const minorDigits = options?.minorDigits ?? 2;
+    let major = 0;
     let minor = 0;
-    if (minorStr.length > 0) {
-      const threeDigits = minorStr.padEnd(3, '0').substring(0, 3);
-      const threeDigitNum = parseInt(threeDigits, 10);
-      minor = Math.round(threeDigitNum / 10); // Round from 3 digits to 2
+    if (minorDigits === 0) {
+      major = Math.round(amount);
+      minor = 0;
+    } else {
+      // Use one extra decimal place to avoid cases like 1.005 -> 1.00
+      const fixed = amount.toFixed(minorDigits + 1);
+      const [majorStr, extraMinorStr = ''] = fixed.split('.');
+      const extraMinor = parseInt(extraMinorStr.padEnd(minorDigits + 1, '0').slice(0, minorDigits + 1), 10);
+      const base = Math.pow(10, minorDigits);
+      let roundedMinor = Math.round(extraMinor / 10);
+      major = parseInt(majorStr, 10);
+      if (roundedMinor === base) {
+        major += 1;
+        roundedMinor = 0;
+      }
+      minor = roundedMinor;
     }
 
     let result = '';
 
+    const units = options?.unitsOverride ?? {
+      majorSingular: 'dollar',
+      majorPlural: 'dollars',
+      minorSingular: 'cent',
+      minorPlural: 'cents',
+    };
+
     if (major === 0) {
-      result = 'zero dollars';
+      result = `zero ${units.majorPlural}`;
     } else if (major === 1) {
-      result = 'one dollar';
+      result = `one ${units.majorSingular}`;
     } else {
-      result = `${numberToWordsEN(major)} dollars`;
+      result = `${numberToWordsEN(major)} ${units.majorPlural}`;
     }
 
     if (minor > 0) {
       if (minor === 1) {
-        result += ' and one cent';
+        result += ` and one ${units.minorSingular}`;
       } else {
-        result += ` and ${numberToWordsEN(minor)} cents`;
+        result += ` and ${numberToWordsEN(minor)} ${units.minorPlural}`;
       }
     }
 

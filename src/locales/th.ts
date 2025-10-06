@@ -1,4 +1,4 @@
-import { LocaleConverter } from '../types';
+import { LocaleConverter, ConversionOptions } from '../types';
 
 const thNum = ['ศูนย์', 'หนึ่ง', 'สอง', 'สาม', 'สี่', 'ห้า', 'หก', 'เจ็ด', 'แปด', 'เก้า'];
 const thPos = ['', 'สิบ', 'ร้อย', 'พัน', 'หมื่น', 'แสน', 'ล้าน'];
@@ -83,7 +83,7 @@ function numberToWordsTH(n: number): string {
 }
 
 export const thConverter: LocaleConverter = {
-  convert(amount: number): string {
+  convert(amount: number, options?: ConversionOptions): string {
     // Validate input
     if (!isFinite(amount)) {
       throw new Error('จำนวนเงินต้องเป็นตัวเลขที่ถูกต้อง');
@@ -98,24 +98,31 @@ export const thConverter: LocaleConverter = {
       throw new Error('จำนวนเงินใหญ่เกินไป (เกินล้านล้านบาท)');
     }
 
-    // Round to 2 decimal places to handle floating point precision
-    const roundedAmount = Math.round(amount * 100) / 100;
-    const [majorStr, minorStr] = roundedAmount.toFixed(2).split('.');
+    // Round according to minorDigits (default 2)
+    const minorDigits = options?.minorDigits ?? 2;
+    const factor = Math.pow(10, minorDigits);
+    const roundedAmount = Math.round(amount * factor) / factor;
+    const [majorStr, minorStr = ''] = roundedAmount.toFixed(minorDigits).split('.');
     const major = parseInt(majorStr, 10);
-    const minor = parseInt(minorStr, 10);
+    const minor = minorDigits > 0 ? parseInt(minorStr || '0', 10) : 0;
 
     let result = '';
 
+    const majorUnit = options?.majorUnit ?? 'บาท';
+    const minorUnit = options?.minorUnit ?? 'สตางค์';
+
     if (major === 0) {
-      result = 'ศูนย์บาท';
+      result = `ศูนย์${majorUnit}`;
     } else {
-      result = numberToWordsTH(major) + 'บาท';
+      result = numberToWordsTH(major) + majorUnit;
     }
 
     if (minor === 0) {
-      result += 'ถ้วน';
+      if (options?.showMinorIfZero !== false) {
+        result += 'ถ้วน';
+      }
     } else {
-      result += numberToWordsTH(minor) + 'สตางค์';
+      result += numberToWordsTH(minor) + minorUnit;
     }
 
     return result;

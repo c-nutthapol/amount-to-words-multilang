@@ -1,4 +1,4 @@
-import { LocaleConverter } from '../types';
+import { LocaleConverter, ConversionOptions } from '../types';
 
 /**
  * Spanish Number to Words Converter
@@ -42,7 +42,7 @@ export class SpanishConverter implements LocaleConverter {
     { value: 1000, singular: 'mil', plural: 'mil' }
   ];
 
-  convert(amount: number): string {
+  convert(amount: number, options?: ConversionOptions): string {
     if (!this.isValidNumber(amount)) {
       throw new Error('Amount must be a non-negative finite number');
     }
@@ -51,21 +51,33 @@ export class SpanishConverter implements LocaleConverter {
       throw new Error('Amount too large');
     }
 
-    const [wholePart, decimalPart] = this.parseAmount(amount);
+    // Round according to minorDigits (default 2)
+    const minorDigits = options?.minorDigits ?? 2;
+    const factor = Math.pow(10, minorDigits);
+    const roundedAmount = Math.round(amount * factor) / factor;
+    const [majorStr, minorStr = ''] = roundedAmount.toFixed(minorDigits).split('.');
+    const wholePart = parseInt(majorStr, 10);
+    const decimalPart = minorDigits > 0 ? parseInt(minorStr || '0', 10) : 0;
 
     let result = '';
 
+    const units = options?.unitsOverride ?? {
+      majorSingular: 'euro',
+      majorPlural: 'euros',
+      minorSingular: 'céntimo',
+      minorPlural: 'céntimos',
+    };
     if (wholePart === 0) {
-      result = 'cero euros';
+      result = `cero ${units.majorPlural}`;
     } else {
       const wholeWords = this.convertWholeNumber(wholePart);
-      const euroText = wholePart === 1 ? 'euro' : 'euros';
+      const euroText = wholePart === 1 ? units.majorSingular : units.majorPlural;
       result = `${wholeWords} ${euroText}`;
     }
 
     if (decimalPart > 0) {
       const centWords = this.convertWholeNumber(decimalPart);
-      const centimoText = decimalPart === 1 ? 'céntimo' : 'céntimos';
+      const centimoText = decimalPart === 1 ? units.minorSingular : units.minorPlural;
       result += ` ${centWords} ${centimoText}`;
     }
 
